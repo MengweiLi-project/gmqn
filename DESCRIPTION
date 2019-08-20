@@ -1,0 +1,15 @@
+Package: gmqn
+Type: Package
+Title: Gaussian Mixture Quantile Normalization (GMQN)
+Version: 0.1.0
+Authors@R: person(given = "Mengwei", family = "Li",
+    email = "limengwei833@gmail.com",
+    role = c("aut", "cre"))
+Maintainer: Mengwei Li <limengwei833@gmail.com>
+Description: GMQN is a reference based method that removes unwanted technical
+    variations at signal intensity level for 450K and 850K DNA methylation array.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Imports: minfi, RPMM, mclust
+RoxygenNote: 6.1.1
