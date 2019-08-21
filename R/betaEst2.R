@@ -1,6 +1,6 @@
 # Internal functions -----------------------------------------------------------
 
-betaEst2 <- function (y, w, weights) {
+.betaEst2 <- function (y, w, weights) {
   yobs <- !is.na(y)
   if (sum(yobs) <= 1)
     return(c(1, 1))
@@ -14,7 +14,7 @@ betaEst2 <- function (y, w, weights) {
   if (sum(yobs) == 2)
     return(exp(logab))
   opt <- try(optim(logab, betaObjf, ydata = y, wdata = w, weights = weights,
-                   method = "Nelder-Mead",control=list(maxit=50) ), silent = TRUE)
+                   method = "Nelder-Mead", control = list(maxit = 50)), silent = TRUE)
   if (inherits(opt, "try-error"))
     return(c(1, 1))
   exp(opt$par)

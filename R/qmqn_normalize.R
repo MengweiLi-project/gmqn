@@ -1,4 +1,4 @@
-#' Add together two numbers.
+#' The implementation of Gaussian Mixture Quantile Normalization (GMQN)
 #'
 #' @param m The matrix of methylation signal intensities.
 #' @param um The matrix of umethylation signal intensities.
@@ -6,7 +6,7 @@
 #' @param type The type of methylation array which can be '450k'(default) or '850k'
 #' @param ref The reference used to normalize data
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
-qmqn_normalize <- function(m, um, probe, type = '450k', ref = list(t1.green.ref.mean=c(361.0165,9646.7525),
+gmqn_normalize <- function(m, um, probe, type = '450k', ref = list(t1.green.ref.mean=c(361.0165,9646.7525),
                                                                     t1.green.ref.sd=c(278.9551,5109.423),
                                                                     t1.red.ref.mean=c(696.0015,12036.3621),
                                                                     t1.red.ref.sd=c(519.3141,7002.863))) {
@@ -27,7 +27,7 @@ qmqn_normalize <- function(m, um, probe, type = '450k', ref = list(t1.green.ref.
   t1.red.index <- match(t1.red, probe)
   t1.red.index <- t1.red.index[which(!is.na(t1.red.index))]
   t1.red.signal <- c(m[t1.red.index], um[t1.red.index])
-  t1.red.model <- Mclust(t1.red.signal, G=2)
+  t1.red.model <- Mclust(t1.red.signal, G=2, verbose = F)
   t1.red.mean <- t1.red.model$parameters$mean
   t1.red.sd <- sqrt(t1.red.model$parameters$variance$sigmasq)
 
@@ -43,7 +43,7 @@ qmqn_normalize <- function(m, um, probe, type = '450k', ref = list(t1.green.ref.
   t1.green.index <- match(t1.green,probe)
   t1.green.index <- t1.green.index[which(!is.na(t1.green.index))]
   t1.green.signal <- c(m[t1.green.index],um[t1.green.index])
-  t1.green.model <- Mclust(t1.green.signal, G=2)
+  t1.green.model <- Mclust(t1.green.signal, G=2, verbose = F)
   t1.green.mean <- t1.green.model$parameters$mean
   t1.green.sd <- sqrt(t1.green.model$parameters$variance$sigmasq)
 

@@ -1,10 +1,10 @@
 # Internal functions -----------------------------------------------------------
 
-blc2 <- function(Y, w, maxiter = 25, tol = 1e-06, weights = NULL, verbose = FALSE) {
+.blc2 <- function(Y, w, maxiter = 25, tol = 1e-06, weights = NULL, verbose = FALSE) {
   Ymn <- min(Y[Y > 0], na.rm = TRUE)
   Ymx <- max(Y[Y < 1], na.rm = TRUE)
   Y <- pmax(Y, Ymn/2)
-  Y <- pmin(Y, 1 - (1 - Ymx)/2)
+  Y <- pmin(Y, 1 - (1 - Ymx) / 2)
   Yobs <- !is.na(Y)
   J <- dim(Y)[2]
   K <- dim(w)[2]
@@ -22,7 +22,7 @@ blc2 <- function(Y, w, maxiter = 25, tol = 1e-06, weights = NULL, verbose = FALS
     mu0 <- mu
     for (k in 1:K) {
       for (j in 1:J) {
-        ab <- betaEst2(Y[, j], w[, k], weights)
+        ab <- .betaEst2(Y[, j], w[, k], weights)
         a[k, j] <- ab[1]
         b[k, j] <- ab[2]
         mu[k, j] <- ab[1]/sum(ab)

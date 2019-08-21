@@ -1,7 +1,13 @@
-# Internal functions -----------------------------------------------------------
-
-BMIQ <- function(beta.v, design.v, nL = 3, doH = TRUE, nfit = 50000, th1.v = c(0.2,0.75),
-                 th2.v = NULL, niter = 5, tol = 0.001){
+#' The implementation of Beta MIxture Quantile dilation (BMIQ)
+#'
+#' @param beta.v A list of DNA methylation level
+#' @param design.v A list of probe design('I' or 'II')
+#' @param probe the probe id for m and um.
+#' @param type The type of methylation array which can be '450k'(default) or '850k'
+#' @param ref The reference used to normalize data
+#' @return A data frame contains normalized m and um, p value, and DNA methylation level
+BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
+                 niter = 5, tol = 0.001){
 
   type1.idx <- which(design.v == 'I')
   type2.idx <- which(design.v == 'II')
@@ -9,7 +15,7 @@ BMIQ <- function(beta.v, design.v, nL = 3, doH = TRUE, nfit = 50000, th1.v = c(0
   beta2.v <- beta.v[type2.idx]
 
   ### estimate initial weight matrix from type1 distribution
-  w0.m <- matrix(0, nrow = length(beta1.v), ncol = nL)
+  w0.m <- matrix(0, nrow = length(beta1.v), ncol = 3)
   w0.m[which(beta1.v < th1.v[1]), 1] <- 1
   w0.m[intersect(which(beta1.v >= th1.v[1]), which(beta1.v <= th1.v[2])), 2] <- 1
   w0.m[which(beta1.v > th1.v[2]), 3] <- 1
@@ -17,7 +23,7 @@ BMIQ <- function(beta.v, design.v, nL = 3, doH = TRUE, nfit = 50000, th1.v = c(0
   ### fit type1 probe
   set.seed(1)
   rand.idx <- sample(1:length(beta1.v), min(c(nfit, length(beta1.v))), replace = FALSE)
-  em1.o <- blc2(Y = matrix(beta1.v[rand.idx], ncol=1),
+  em1.o <- .blc2(Y = matrix(beta1.v[rand.idx], ncol=1),
                 w = w0.m[rand.idx, ], maxiter = niter, tol = tol)
   subsetclass1.v <- apply(em1.o$w, 1, which.max)
   subsetth1.v <- c(mean(max(beta1.v[rand.idx[subsetclass1.v == 1]]),
@@ -52,13 +58,13 @@ BMIQ <- function(beta.v, design.v, nL = 3, doH = TRUE, nfit = 50000, th1.v = c(0
   th2.v[2] <- nth1.v[2] + (mod2M - mod1M)
 
   ### estimate initial weight matrix
-  w0.m <- matrix(0, nrow = length(beta2.v), ncol = nL)
+  w0.m <- matrix(0, nrow = length(beta2.v), ncol = 3)
   w0.m[which(beta2.v <= th2.v[1]), 1] <- 1
   w0.m[intersect(which(beta2.v > th2.v[1]), which(beta2.v <= th2.v[2])), 2] <- 1
   w0.m[which(beta2.v > th2.v[2]), 3] <- 1
 
   rand.idx <- sample(1:length(beta2.v), min(c(nfit, length(beta2.v))), replace = FALSE)
-  em2.o <- blc2(Y = matrix(beta2.v[rand.idx], ncol=1),
+  em2.o <- .blc2(Y = matrix(beta2.v[rand.idx], ncol=1),
                 w = w0.m[rand.idx, ], maxiter = niter, tol = tol)
 
   ### for type II probes assign to state (unmethylated, hemi or full methylation)
@@ -83,7 +89,7 @@ BMIQ <- function(beta.v, design.v, nL = 3, doH = TRUE, nfit = 50000, th1.v = c(0
 
   classAV1.v <- vector()
   classAV2.v <- vector()
-  for(l in 1:nL){
+  for(l in 1:3){
     classAV1.v[l] <- em1.o$mu[l, 1]
     classAV2.v[l] <- em2.o$mu[l, 1]
   }
@@ -122,24 +128,24 @@ BMIQ <- function(beta.v, design.v, nL = 3, doH = TRUE, nfit = 50000, th1.v = c(0
                em1.o$b[lt, 1], lower.tail = FALSE)
   nbeta2.v[selMR.idx] <- q.v
 
-  if(doH){
-    lt <- 2
-    selH.idx <- c(which(class2.v == lt), selML.idx)
-    minH <- min(beta2.v[selH.idx])
-    maxH <- max(beta2.v[selH.idx])
-    deltaH <- maxH - minH
-    deltaUH <- -max(beta2.v[selU.idx]) + min(beta2.v[selH.idx])
-    deltaHM <- -max(beta2.v[selH.idx]) + min(beta2.v[selMR.idx])
 
-    nmaxH <- min(nbeta2.v[selMR.idx]) - deltaHM
-    ## new minimum of H probes should be
-    nminH <- max(nbeta2.v[selU.idx]) + deltaUH
-    ndeltaH <- nmaxH - nminH
+  lt <- 2
+  selH.idx <- c(which(class2.v == lt), selML.idx)
+  minH <- min(beta2.v[selH.idx])
+  maxH <- max(beta2.v[selH.idx])
+  deltaH <- maxH - minH
+  deltaUH <- -max(beta2.v[selU.idx]) + min(beta2.v[selH.idx])
+  deltaHM <- -max(beta2.v[selH.idx]) + min(beta2.v[selMR.idx])
 
-    ### perform conformal transformation (shift+dilation)
-    hf <- ndeltaH / deltaH
-    nbeta2.v[selH.idx] <- nminH + hf * (beta2.v[selH.idx] - minH)
-  }
+  nmaxH <- min(nbeta2.v[selMR.idx]) - deltaHM
+  ## new minimum of H probes should be
+  nminH <- max(nbeta2.v[selU.idx]) + deltaUH
+  ndeltaH <- nmaxH - nminH
+
+  ### perform conformal transformation (shift+dilation)
+  hf <- ndeltaH / deltaH
+  nbeta2.v[selH.idx] <- nminH + hf * (beta2.v[selH.idx] - minH)
+
 
   pnbeta.v <- beta.v
   pnbeta.v[type1.idx] <- beta1.v
