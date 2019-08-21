@@ -1,10 +1,8 @@
-#' The implementation of Beta MIxture Quantile dilation (BMIQ)
+#' Beta MIxture Quantile dilation (BMIQ)
 #'
+#' The BMIQ was developed by Andrew Teschendorff in 2013 and this implementation is the based on the version modified by Steve Horvath. I also removed and modified some parameters to simplify the function.
 #' @param beta.v A list of DNA methylation level
 #' @param design.v A list of probe design('I' or 'II')
-#' @param probe the probe id for m and um.
-#' @param type The type of methylation array which can be '450k'(default) or '850k'
-#' @param ref The reference used to normalize data
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
 BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
                  niter = 5, tol = 0.001){

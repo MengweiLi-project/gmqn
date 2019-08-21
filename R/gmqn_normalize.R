@@ -1,15 +1,21 @@
-#' The implementation of Gaussian Mixture Quantile Normalization (GMQN)
+#' Gaussian Mixture Quantile Normalization (GMQN)
 #'
-#' @param m The matrix of methylation signal intensities.
-#' @param um The matrix of umethylation signal intensities.
+#' The implementation of Gaussian Mixture Quantile Normalization (GMQN)
+#' @param m The vector of methylation signal intensities.
+#' @param um The vector of umethylation signal intensities.
 #' @param probe the probe id for m and um.
 #' @param type The type of methylation array which can be '450k'(default) or '850k'
-#' @param ref The reference used to normalize data
+#' @param ref The reference used to normalize data. By default, it uses the reference set up from GSE105018 which is also used in EWAS Datahub.
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
-gmqn_normalize <- function(m, um, probe, type = '450k', ref = list(t1.green.ref.mean=c(361.0165,9646.7525),
-                                                                    t1.green.ref.sd=c(278.9551,5109.423),
-                                                                    t1.red.ref.mean=c(696.0015,12036.3621),
-                                                                    t1.red.ref.sd=c(519.3141,7002.863))) {
+gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
+
+  if (ref == 'default') {
+    ref = list(t1.green.ref.mean=c(361.0165,9646.7525),
+               t1.green.ref.sd=c(278.9551,5109.423),
+               t1.red.ref.mean=c(696.0015,12036.3621),
+               t1.red.ref.sd=c(519.3141,7002.863))
+  }
+
   if (type == '450k') {
     t1.red <- row.names(annon_450k)[which(annon_450k$color == 'Red' & annon_450k$probe_type == 'I')]
     t1.green <- row.names(annon_450k)[which(annon_450k$color == 'Grn' & annon_450k$probe_type == 'I')]
