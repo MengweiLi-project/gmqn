@@ -1,4 +1,4 @@
 exportPattern("^[[:alpha:]]+")
 import(RPMM)
 importFrom(mclust, Mclust, mclustBIC)
-export(BMIQ, qmqn_normalize)
+export(BMIQ, gmqn_normalize)
