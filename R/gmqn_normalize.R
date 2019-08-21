@@ -86,8 +86,10 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   names(normalized.signal) <- c("m", "um", "p")
 
   print("Normalizing between probe type----------------------------------")
-  normalized.signal[which(normalized.signal$m == Inf), "m"] <- max(normalized.signal$m[normalized.signal$m != Inf])
-  normalized.signal[which(normalized.signal$um == Inf), "um"] <- max(normalized.signal$um[normalized.signal$um != Inf])
+  normalized.signal[which(normalized.signal$m == Inf), "m"] <- max(normalized.signal$m[normalized.signal$m > 0])
+  normalized.signal[which(normalized.signal$m == 0), "m"] <- max(normalized.signal$m[normalized.signal$m > 0])
+  normalized.signal[which(normalized.signal$um == Inf), "um"] <- max(normalized.signal$um[normalized.signal$um > 0])
+  normalized.signal[which(normalized.signal$um == 0), "um"] <- max(normalized.signal$um[normalized.signal$um > 0])
   beta <- normalized.signal$m / (normalized.signal$m + normalized.signal$um)
   beta.adjust <- BMIQ(beta, type)
   beta.adjust <- beta.adjust

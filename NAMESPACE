@@ -2,3 +2,6 @@ exportPattern("^[[:alpha:]]+")
 import(RPMM)
 importFrom(mclust, Mclust, mclustBIC)
 export(BMIQ, gmqn_normalize)
+
+
+
