@@ -20,13 +20,13 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
 
   ### fit type1 probe
   set.seed(1)
-  hypo.m = which(beta1.v < 0.2)
-  hyper.m = which(beta1.v > 0.75)
-  median.m = which(beta1.v >= 0.2 & beta1.v <= 0.75)
-  rand.idx = c(sample(hypo.m, 10000, replace = F),
-               sample(hyper.m, 10000, replace = F),
-               sample(median.m, 10000, replace = F))
-  #rand.idx <- sample(1:length(beta1.v), min(c(nfit, length(beta1.v))), replace = FALSE)
+  #hypo.m = which(beta1.v < 0.2)
+  #hyper.m = which(beta1.v > 0.75)
+  #median.m = which(beta1.v >= 0.2 & beta1.v <= 0.75)
+  #rand.idx = c(sample(hypo.m, 10000, replace = F),
+  #             sample(hyper.m, 10000, replace = F),
+  #             sample(median.m, 10000, replace = F))
+  rand.idx <- sample(1:length(beta1.v), min(c(nfit, length(beta1.v))), replace = FALSE)
   em1.o <- .blc2(Y = matrix(beta1.v[rand.idx], ncol=1),
                 w = w0.m[rand.idx, ], maxiter = niter, tol = tol)
   subsetclass1.v <- apply(em1.o$w, 1, which.max)
@@ -38,7 +38,7 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   class1.v[which(beta1.v < subsetth1.v[1])] <- 1
   class1.v[which(beta1.v > subsetth1.v[2])] <- 3
   nth1.v <- subsetth1.v
-
+  print(subsetth1.v)
   ### Estimate Modes
   if (sum(class1.v == 1) == 1){ mod1U <- beta1.v[class1.v == 1] }
   if (sum(class1.v == 3) == 1){ mod1M <- beta1.v[class1.v == 3] }
@@ -67,14 +67,14 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   w0.m[intersect(which(beta2.v > th2.v[1]), which(beta2.v <= th2.v[2])), 2] <- 1
   w0.m[which(beta2.v > th2.v[2]), 3] <- 1
 
-  hypo.m = which(beta2.v < th2.v[1])
-  hyper.m = which(beta2.v > th2.v[2])
-  median.m = which(beta2.v >= th2.v[1] & beta1.v <= th2.v[2])
-  rand.idx = c(sample(hypo.m, 10000, replace = F),
-               sample(hyper.m, 10000, replace = F),
-               sample(median.m, 10000, replace = F))
+  #hypo.m = which(beta2.v < th2.v[1])
+  #hyper.m = which(beta2.v > th2.v[2])
+  #median.m = which(beta2.v >= th2.v[1] & beta1.v <= th2.v[2])
+  #rand.idx = c(sample(hypo.m, 10000, replace = F),
+  #             sample(hyper.m, 10000, replace = F),
+  #             sample(median.m, 10000, replace = F))
 
-  #rand.idx <- sample(1:length(beta2.v), min(c(nfit, length(beta2.v))), replace = FALSE)
+  rand.idx <- sample(1:length(beta2.v), min(c(nfit, length(beta2.v))), replace = FALSE)
   em2.o <- .blc2(Y = matrix(beta2.v[rand.idx], ncol=1),
                 w = w0.m[rand.idx, ], maxiter = niter, tol = tol)
 
