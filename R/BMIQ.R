@@ -22,7 +22,8 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   set.seed(1)
   hypo.m = which(beta1.v < 0.2)
   hyper.m = which(beta1.v > 0.7)
-  median.m = which(beta1.v >= 0.2 & beta1.v <= 0.75)
+  median.m = which(beta1.v >= 0.2 & beta1.v <= 0.7)
+  print(c(length(hypo.m),length(hyper.m),length(median.m), length(beta1.v)))
   rand.idx = c(sample(hypo.m, 10000, replace = F),
                sample(hyper.m, 10000, replace = F),
                sample(median.m, 10000, replace = F))
@@ -69,7 +70,7 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
 
   hypo.m = which(beta2.v < th2.v[1])
   hyper.m = which(beta2.v > th2.v[2])
-  median.m = which(beta2.v >= th2.v[1] & beta1.v <= th2.v[2])
+  median.m = which(beta2.v >= th2.v[1] & beta2.v <= th2.v[2])
   rand.idx = c(sample(hypo.m, 10000, replace = F),
                sample(hyper.m, 10000, replace = F),
                sample(median.m, 10000, replace = F))
