@@ -13,8 +13,8 @@ set_reference <- function(m, um, type = '450k') {
   }
   print('Processing the input data---------------------------------------')
   probe = row.names(m)
-  m = as.numeric(apply(m, 1, median))
-  um = as.numeric(apply(um, 1, median))
+  m = as.numeric(apply(m, 1, mean))
+  um = as.numeric(apply(um, 1, mean))
 
   if (type == '450k') {
     t1.red <- row.names(annon_450k)[which(annon_450k$color == 'Red' & annon_450k$probe_type == 'I')]
