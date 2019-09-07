@@ -115,11 +115,12 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   selUL.idx <- selU.idx[which(beta2.v[selU.idx] < classAV2.v[lt])]
   ### find prob according to typeII distribution
   p.v <- pbeta(beta2.v[selUR.idx], em2.o$a[lt, 1],
-               em2.o$b[lt, 1], lower.tail = FALSE)
+               em2.o$b[lt, 1], lower.tail = FALSE) ######
   ### find corresponding quantile in type I distribution
   q.v <- qbeta(p.v, em1.o$a[lt, 1],
                em1.o$b[lt, 1], lower.tail = FALSE)
   nbeta2.v[selUR.idx] <- q.v
+
   p.v <- pbeta(beta2.v[selUL.idx], em2.o$a[lt, 1],
                em2.o$b[lt, 1], lower.tail=TRUE)
   ### find corresponding quantile in type I distribution
