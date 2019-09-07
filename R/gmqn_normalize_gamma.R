@@ -31,8 +31,8 @@ gmqn_normalize_gamma <- function(m, um, probe, type = '450k', ref) {
   t1.red.beta <- as.numeric(t1.red.model$gamma.pars[2,])
 
   print("Normalizing probe of type 1 red---------------------------------")
-  sub.pro = cbind(pgamma(t1.red.signal, t1.red.alpha[1], t1.red.beta[1]),
-                  pgamma(t1.red.signal, t1.red.alpha[2], t1.red.beta[2]))
+  sub.pro = cbind(pgamma(t1.red.signal, t1.red.alpha[1], 1/t1.red.beta[1]),
+                  pgamma(t1.red.signal, t1.red.alpha[2], 1/t1.red.beta[2]))
   subsetclass <- apply(sub.pro, 1, which.max)
   temp = t1.red.signal
   t1.red.signal[which(subsetclass == 1)] <- qgamma(pgamma(t1.red.signal[which(subsetclass == 1)], t1.red.alpha[1], 1/t1.red.beta[1]), ref$t1.red.ref.alpha[1], 1/ref$t1.red.ref.beta[1])
@@ -53,8 +53,8 @@ gmqn_normalize_gamma <- function(m, um, probe, type = '450k', ref) {
   t1.green.beta <- as.numeric(t1.green.model$gamma.pars[2,])
 
   print("Normalizing probe of type 1 green-------------------------------")
-  sub.pro = cbind(pgamma(t1.green.signal, t1.green.alpha[1], t1.green.beta[1]),
-                  pgamma(t1.green.signal, t1.green.alpha[2], t1.green.beta[2]))
+  sub.pro = cbind(pgamma(t1.green.signal, t1.green.alpha[1], 1/t1.green.beta[1]),
+                  pgamma(t1.green.signal, t1.green.alpha[2], 1/t1.green.beta[2]))
   subsetclass <- apply(sub.pro, 1, which.max)
   temp = t1.green.signal
   t1.green.signal[which(subsetclass == 1)] <- qgamma(pgamma(t1.green.signal[which(subsetclass == 1)], t1.green.alpha[1], 1/t1.green.beta[1]), ref$t1.green.ref.alpha[1], 1/ref$t1.green.ref.beta[1])
