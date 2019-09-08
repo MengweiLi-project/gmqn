@@ -75,8 +75,8 @@ gmqn_normalize_gamma <- function(m, um, probe, type = '450k', ref) {
   pIG <- apply(cbind(1 - pgamma(m[t1.green.index], t1.green.alpha[1], 1/t1.green.beta[1]),
                      1 - pgamma(um[t1.green.index], t1.green.alpha[1], 1/t1.green.beta[1])),
                1, min)
-  pII <- apply(cbind(1 - pgamma(um[t2.index], t1.green.alpha[1], 1/t1.green.beta[1]),
-                     1 - pgamma(m[t2.index], t1.red.alpha[1], 1/t1.red.beta[1])),
+  pII <- apply(cbind(1 - pgamma(um[t2.index], t1.red.alpha[1], 1/t1.red.beta[1]),
+                     1 - pgamma(m[t2.index], t1.green.alpha[1], 1/t1.green.beta[1])),
                1, min)
   p <- cbind(c(pIR, pIG , pII),
              c(probe[t1.red.index], probe[t1.green.index], probe[t2.index]))

@@ -78,8 +78,8 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   pIG <- apply(cbind(1 - pnorm(m[t1.green.index], t1.green.mean[1], t1.green.sd[1]),
                      1 - pnorm(um[t1.green.index], t1.green.mean[1], t1.green.sd[1])),
                1, min)
-  pII <- apply(cbind(1 - pnorm(um[t2.index], t1.green.mean[1], t1.green.sd[1]),
-                     1 - pnorm(m[t2.index], t1.red.mean[1], t1.red.sd[1])),
+  pII <- apply(cbind(1 - pnorm(um[t2.index], t1.red.mean[1], t1.red.sd[1]),
+                     1 - pnorm(m[t2.index], t1.green.mean[1], t1.green.sd[1])),
                1, min)
   p <- cbind(c(pIR, pIG , pII),
           c(probe[t1.red.index], probe[t1.green.index], probe[t2.index]))
