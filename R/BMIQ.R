@@ -21,9 +21,8 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   ### fit type1 probe
   set.seed(1)
   hypo.m = which(beta1.v < 0.2)
-  hyper.m = which(beta1.v > 0.7)
-  median.m = which(beta1.v >= 0.2 & beta1.v <= 0.7)
-  print(c(length(hypo.m),length(hyper.m),length(median.m), length(beta1.v)))
+  hyper.m = which(beta1.v > 0.75)
+  median.m = which(beta1.v >= 0.2 & beta1.v <= 0.75)
   rand.idx = c(sample(hypo.m, 10000, replace = F),
                sample(hyper.m, 10000, replace = F),
                sample(median.m, 10000, replace = F))
@@ -31,10 +30,10 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   em1.o <- .blc2(Y = matrix(beta1.v[rand.idx], ncol=1),
                 w = w0.m[rand.idx, ], maxiter = niter, tol = tol)
   subsetclass1.v <- apply(em1.o$w, 1, which.max)
-  subsetth1.v <- c(mean(max(beta1.v[rand.idx[subsetclass1.v == 1]]),
-                        min(beta1.v[rand.idx[subsetclass1.v == 2]])),
-                   mean(max(beta1.v[rand.idx[subsetclass1.v==2]]),
-                        min(beta1.v[rand.idx[subsetclass1.v==3]])))
+  subsetth1.v <- c(mean(c(max(beta1.v[rand.idx[subsetclass1.v == 1]]),
+                        min(beta1.v[rand.idx[subsetclass1.v == 2]]))),
+                   mean(c(max(beta1.v[rand.idx[subsetclass1.v==2]]),
+                        min(beta1.v[rand.idx[subsetclass1.v==3]]))))
   class1.v <- rep(2, length(beta1.v))
   class1.v[which(beta1.v < subsetth1.v[1])] <- 1
   class1.v[which(beta1.v > subsetth1.v[2])] <- 3
@@ -83,10 +82,10 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   subsetclass2.v <- apply(em2.o$w, 1, which.max)
 
   if (sum(subsetclass2.v == 2) > 0){
-    subsetth2.v <- c(mean(max(beta2.v[rand.idx[subsetclass2.v == 1]]),
-                          min(beta2.v[rand.idx[subsetclass2.v == 2]])),
-                    mean(max(beta2.v[rand.idx[subsetclass2.v == 2]]),
-                         min(beta2.v[rand.idx[subsetclass2.v == 3]])))
+    subsetth2.v <- c(mean(c(max(beta2.v[rand.idx[subsetclass2.v == 1]]),
+                          min(beta2.v[rand.idx[subsetclass2.v == 2]]))),
+                    mean(c(max(beta2.v[rand.idx[subsetclass2.v == 2]]),
+                         min(beta2.v[rand.idx[subsetclass2.v == 3]]))))
   }
   if (sum(subsetclass2.v == 2) == 0){
     subsetth2.v <- c(1 / 2 * max(beta2.v[rand.idx[subsetclass2.v == 1]]) +
