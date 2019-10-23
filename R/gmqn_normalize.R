@@ -45,8 +45,8 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   t1.red.signal[which(t1.red.model$classification == 2 & t1.red.signal > t1.red.mean[2])] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 2 & t1.red.signal > t1.red.mean[2])], t1.red.mean[2], t1.red.sd[2]), ref$t1.red.ref.mean[2], ref$t1.red.ref.sd[2])
   h.signal = t1.red.signal[which(t1.red.signal >= t1.red.mean[1] & t1.red.signal <= t1.red.mean[2])]
   hf = t1.red.mean[2] - t1.red.mean[1]
-  hf.ref = t1.red.ref.mean[2] - t1.red.ref.mean[1]
-  t1.red.signal[which(t1.red.signal >= t1.red.mean[1] & t1.red.signal <= t1.red.mean[2])] = t1.red.ref.mean[1] + (h.signal - t1.red.mean[1])*hf.ref/hf
+  hf.ref = ref$t1.red.ref.mean[2] - ref$t1.red.ref.mean[1]
+  t1.red.signal[which(t1.red.signal >= t1.red.mean[1] & t1.red.signal <= t1.red.mean[2])] = ref$t1.red.ref.mean[1] + (h.signal - t1.red.mean[1])*hf.ref/hf
 
   t1.red.signal[which(t1.red.signal == Inf)] = temp[which(t1.red.signal == Inf)]
 
@@ -70,8 +70,8 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   t1.green.signal[which(t1.green.model$classification == 2 & t1.green.signal > t1.green.mean[2])] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 2 & t1.green.signal > t1.green.mean[2])], t1.green.mean[2], t1.green.sd[2]), ref$t1.green.ref.mean[2], ref$t1.green.ref.sd[2])
   h.signal = t1.green.signal[which(t1.green.signal >= t1.green.mean[1] & t1.green.signal <= t1.green.mean[2])]
   hf = t1.green.mean[2] - t1.green.mean[1]
-  hf.ref = t1.green.ref.mean[2] - t1.green.ref.mean[1]
-  t1.green.signal[which(t1.green.signal >= t1.green.mean[1] & t1.green.signal <= t1.green.mean[2])] = t1.green.ref.mean[1] + (h.signal - t1.green.mean[1])*hf.ref/hf
+  hf.ref = ref$t1.green.ref.mean[2] - ref$t1.green.ref.mean[1]
+  t1.green.signal[which(t1.green.signal >= t1.green.mean[1] & t1.green.signal <= t1.green.mean[2])] = ref$t1.green.ref.mean[1] + (h.signal - t1.green.mean[1])*hf.ref/hf
 
   t1.green.signal[which(t1.green.signal == Inf)] = temp[which(t1.green.signal == Inf)]
 
