@@ -94,7 +94,7 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   beta <- normalized.signal$m / (normalized.signal$m + normalized.signal$um)
   beta[which(p < 0.01)] <- BMIQ(beta[which(p < 0.01)], type[which(p < 0.01)])
   beta[which(p >= 0.01)] = NA
-  normalized.signal$beta <- beta.adjust
+  normalized.signal$beta <- beta
   return(normalized.signal)
   print("Finished--------------------------------------------------------")
 }
