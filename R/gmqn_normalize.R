@@ -37,17 +37,14 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   t1.red.mean <- t1.red.model$parameters$mean
   t1.red.sd <- sqrt(t1.red.model$parameters$variance$sigmasq)
 
+  pIR <- apply(cbind(1 - pnorm(m[t1.red.index], t1.red.mean[1], t1.red.sd[1]),
+                     1 - pnorm(um[t1.red.index], t1.red.mean[1], t1.red.sd[1])),
+               1, min)
+
   print("Normalizing probe of type 1 red---------------------------------")
   temp = t1.red.signal
   t1.red.signal[which(t1.red.model$classification == 1)] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 1)], t1.red.mean[1], t1.red.sd[1]), ref$t1.red.ref.mean[1], ref$t1.red.ref.sd[1])
-  # t1.red.signal[which(t1.red.model$classification == 1 & t1.red.signal < t1.red.mean[1])] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 1 & t1.red.signal < t1.red.mean[1])], t1.red.mean[1], t1.red.sd[1]), ref$t1.red.ref.mean[1], ref$t1.red.ref.sd[1])
   t1.red.signal[which(t1.red.model$classification == 2)] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 2)], t1.red.mean[2], t1.red.sd[2]), ref$t1.red.ref.mean[2], ref$t1.red.ref.sd[2])
-  # t1.red.signal[which(t1.red.model$classification == 2 & t1.red.signal > t1.red.mean[2])] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 2 & t1.red.signal > t1.red.mean[2])], t1.red.mean[2], t1.red.sd[2]), ref$t1.red.ref.mean[2], ref$t1.red.ref.sd[2])
-  # h.signal = t1.red.signal[which(t1.red.signal >= t1.red.mean[1] & t1.red.signal <= t1.red.mean[2])]
-  # hf = t1.red.mean[2] - t1.red.mean[1]
-  # hf.ref = ref$t1.red.ref.mean[2] - ref$t1.red.ref.mean[1]
-  # t1.red.signal[which(t1.red.signal >= t1.red.mean[1] & t1.red.signal <= t1.red.mean[2])] = ref$t1.red.ref.mean[1] + (h.signal - t1.red.mean[1])*hf.ref/hf
-
   t1.red.signal[which(t1.red.signal == Inf)] = temp[which(t1.red.signal == Inf)]
 
   m[t1.red.index] <- t1.red.signal[1:(length(t1.red.signal)/2)]
@@ -61,17 +58,14 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   t1.green.mean <- t1.green.model$parameters$mean
   t1.green.sd <- sqrt(t1.green.model$parameters$variance$sigmasq)
 
+  pIG <- apply(cbind(1 - pnorm(m[t1.green.index], t1.green.mean[1], t1.green.sd[1]),
+                     1 - pnorm(um[t1.green.index], t1.green.mean[1], t1.green.sd[1])),
+               1, min)
+
   print("Normalizing probe of type 1 green-------------------------------")
   temp = t1.green.signal
   t1.green.signal[which(t1.green.model$classification == 1)] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 1)],t1.green.mean[1], t1.green.sd[1]), ref$t1.green.ref.mean[1], ref$t1.green.ref.sd[1])
   t1.green.signal[which(t1.green.model$classification == 2)] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 2)],t1.green.mean[2], t1.green.sd[2]), ref$t1.green.ref.mean[2], ref$t1.green.ref.sd[2])
-
-  # t1.green.signal[which(t1.green.model$classification == 1 & t1.green.signal < t1.green.mean[1])] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 1 & t1.green.signal < t1.green.mean[1])], t1.green.mean[1], t1.green.sd[1]), ref$t1.green.ref.mean[1], ref$t1.green.ref.sd[1])
-  # t1.green.signal[which(t1.green.model$classification == 2 & t1.green.signal > t1.green.mean[2])] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 2 & t1.green.signal > t1.green.mean[2])], t1.green.mean[2], t1.green.sd[2]), ref$t1.green.ref.mean[2], ref$t1.green.ref.sd[2])
-  # h.signal = t1.green.signal[which(t1.green.signal >= t1.green.mean[1] & t1.green.signal <= t1.green.mean[2])]
-  # hf = t1.green.mean[2] - t1.green.mean[1]
-  # hf.ref = ref$t1.green.ref.mean[2] - ref$t1.green.ref.mean[1]
-  # t1.green.signal[which(t1.green.signal >= t1.green.mean[1] & t1.green.signal <= t1.green.mean[2])] = ref$t1.green.ref.mean[1] + (h.signal - t1.green.mean[1])*hf.ref/hf
 
   t1.green.signal[which(t1.green.signal == Inf)] = temp[which(t1.green.signal == Inf)]
 
@@ -82,12 +76,6 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   print("Detecting p value-----------------------------------------------")
   t2.index <- match(t2, probe)
   t2.index <- t2.index[which(!is.na(t2.index))]
-  pIR <- apply(cbind(1 - pnorm(m[t1.red.index], t1.red.mean[1], t1.red.sd[1]),
-                     1 - pnorm(um[t1.red.index], t1.red.mean[1], t1.red.sd[1])),
-               1, min)
-  pIG <- apply(cbind(1 - pnorm(m[t1.green.index], t1.green.mean[1], t1.green.sd[1]),
-                     1 - pnorm(um[t1.green.index], t1.green.mean[1], t1.green.sd[1])),
-               1, min)
   pII <- apply(cbind(1 - pnorm(um[t2.index], t1.red.mean[1], t1.red.sd[1]),
                      1 - pnorm(m[t2.index], t1.green.mean[1], t1.green.sd[1])),
                1, min)
@@ -103,13 +91,9 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   names(normalized.signal) <- c("m", "um", "p")
 
   print("Normalizing between probe type----------------------------------")
-  normalized.signal[which(normalized.signal$m == Inf), "m"] <- max(normalized.signal$m[normalized.signal$m > 0])
-  normalized.signal[which(normalized.signal$m == 0), "m"] <- min(normalized.signal$m[normalized.signal$m > 0])
-  normalized.signal[which(normalized.signal$um == Inf), "um"] <- max(normalized.signal$um[normalized.signal$um > 0])
-  normalized.signal[which(normalized.signal$um == 0), "um"] <- min(normalized.signal$um[normalized.signal$um > 0])
   beta <- normalized.signal$m / (normalized.signal$m + normalized.signal$um)
-  beta.adjust <- BMIQ(beta, type)
-  beta.adjust <- beta.adjust
+  beta[which(p < 0.01)] <- BMIQ(beta[which(p < 0.01)], type[which(p < 0.01)])
+  beta[which(p >= 0.01)] = NA
   normalized.signal$beta <- beta.adjust
   return(normalized.signal)
   print("Finished--------------------------------------------------------")

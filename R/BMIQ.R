@@ -23,9 +23,9 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
   hypo.m = which(beta1.v < 0.2)
   hyper.m = which(beta1.v > 0.75)
   median.m = which(beta1.v >= 0.2 & beta1.v <= 0.75)
-  rand.idx = c(sample(hypo.m, 10000, replace = F),
-               sample(hyper.m, 10000, replace = F),
-               sample(median.m, 10000, replace = F))
+  rand.idx = c(sample(hypo.m, 10000, replace = T),
+               sample(hyper.m, 10000, replace = T),
+               sample(median.m, 10000, replace = T))
   #rand.idx <- sample(1:length(beta1.v), min(c(nfit, length(beta1.v))), replace = FALSE)
   em1.o <- .blc2(Y = matrix(beta1.v[rand.idx], ncol=1),
                 w = w0.m[rand.idx, ], maxiter = niter, tol = tol)
