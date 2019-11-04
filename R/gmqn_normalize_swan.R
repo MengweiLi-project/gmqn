@@ -91,8 +91,8 @@ gmqn_normalize_swan <- function(m, um, probe, type = '450k', ref = 'default') {
   names(normalized.signal) <- c("m", "um", "p")
 
   print("Normalizing between probe type----------------------------------")
-
-  swan.processed = modifiedSWAN(m, um, probe)
+  m = data.frame(m)
+  swan.processed = modifiedSWAN(data.frame(m, row.names = probe), data.frame(um, row.names = probe), probe)
 
   beta <- swan.processed$M / (swan.processed$M + swan.processed$U)
   beta[which(normalized.signal$p >= 0.01)] = NA
