@@ -4,7 +4,8 @@
 \alias{gmqn_normalize}
 \title{Gaussian Mixture Quantile Normalization (GMQN)}
 \usage{
-gmqn_normalize(m, um, probe, type = "450k", ref = "default")
+gmqn_normalize(m, um, probe, type = "450k", ref = "default",
+  verbose = TRUE)
 }
 \arguments{
 \item{m}{The vector of methylation signal intensities.}
@@ -18,7 +19,7 @@ gmqn_normalize(m, um, probe, type = "450k", ref = "default")
 \item{ref}{The reference used to normalize data. By default, it uses the reference set up from GSE105018 which is also used in EWAS Datahub.}
 }
 \value{
-A data frame contains normalized m and um, p value, and DNA methylation level
+A data frame contains normalized m and um, p value
 }
 \description{
 The implementation of Gaussian Mixture Quantile Normalization (GMQN)
