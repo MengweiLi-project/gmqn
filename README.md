@@ -1,0 +1,68 @@
+---
+title: "Gaussian Mixture Quantile Normalization (GMQN)"
+---
+
+GMQN is a reference based method that removes unwanted technical variations at signal intensity level between samples for 450K and 850K DNA methylation array. It can also easily combined with Subset-quantile Within Array Normalization(SWAN) or Beta-Mixture Quantile (BMIQ) Normalisation to remove probe design bias.
+
+## Installation
+
+You can install GMQN R package by following steps. We will submit the R package to Bioconductor soon.
+
+```{r}
+devtools::install_github('MengweiLi-project/gmqn')
+library(gmqn)
+```
+## Dependencies
+GMQN depends on the following packages, all available in CRAN.
+
+* mclust
+* RPMM
+
+## Demos
+
+### when you have raw(.idat) data
+
+Suppose your idat files is in the "idat/" directory.
+
+```{r}
+# I recommend using minfi to read the raw data and do preprocess.
+# But other packages can also be used. 
+library(minfi)
+RGSet = read.metharray.exp("idat/")
+MSet <- preprocessRaw(RGSet) # Other preprocess methods can also be used.
+m = data.frame(getMeth(MSet))
+um = data.frame(getUnmeth(MSet))
+
+# You can skip this line if you want to use default reference.
+ref = set_reference(m, um)
+
+library(gmqn)
+# GMQN is easy to parallelize by using 'foreach' and 'doParallel'. 
+# You can also use non parallel iterations. 
+# The example is parallelized.
+
+registerDoParallel(10) 
+# Here, we use 10 threads, you can change it denpend on the hardware of your machine.
+beta.GMQN.swan = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
+  res = gmqn_swan(m[, i], um[, i], row.names(m), ref = ref)
+  res$beta
+}
+beta.GMQN.swan = data.frame(beta.GMQN.swan)
+names(beta.GMQN.swan) = names(m)
+row.names(beta.GMQN.swan) = row.names(m)
+
+beta.GMQN.BMIQ = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
+  res = gmqn_bmiq(m[, i], um[, i], row.names(m), ref = ref)
+  res$beta
+}
+beta.GMQN.BMIQ= data.frame(beta.GMQN.BMIQ)
+names(beta.GMQN.BMIQ) = names(m)
+row.names(beta.GMQN.BMIQ) = row.names(m)
+
+```
+
+
+
+
+
+

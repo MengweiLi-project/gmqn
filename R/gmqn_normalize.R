@@ -6,8 +6,8 @@
 #' @param probe the probe id for m and um.
 #' @param type The type of methylation array which can be '450k'(default) or '850k'
 #' @param ref The reference used to normalize data. By default, it uses the reference set up from GSE105018 which is also used in EWAS Datahub.
-#' @return A data frame contains normalized m and um, p value, and DNA methylation level
-gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
+#' @return A data frame contains normalized m and um, p value
+gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default', verbose = TRUE) {
 
   if (ref == 'default') {
     ref = list(t1.green.ref.mean=c(361.0165,9646.7525),
@@ -29,7 +29,7 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   }
 
   set.seed(1)
-  print("Fitting Gaussian mixture model for probe of type 1 red----------")
+  if(verbose) message("Fitting Gaussian mixture model for probe of type 1 red")
   t1.red.index <- match(t1.red, probe)
   t1.red.index <- t1.red.index[which(!is.na(t1.red.index))]
   t1.red.signal <- c(m[t1.red.index], um[t1.red.index])
@@ -41,7 +41,8 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
                      1 - pnorm(um[t1.red.index], t1.red.mean[1], t1.red.sd[1])),
                1, min)
 
-  print("Normalizing probe of type 1 red---------------------------------")
+  if(verbose) message("Normalizing probe of type 1 red")
+
   temp = t1.red.signal
   t1.red.signal[which(t1.red.model$classification == 1)] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 1)], t1.red.mean[1], t1.red.sd[1]), ref$t1.red.ref.mean[1], ref$t1.red.ref.sd[1])
   t1.red.signal[which(t1.red.model$classification == 2)] <- qnorm(pnorm(t1.red.signal[which(t1.red.model$classification == 2)], t1.red.mean[2], t1.red.sd[2]), ref$t1.red.ref.mean[2], ref$t1.red.ref.sd[2])
@@ -50,7 +51,7 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   m[t1.red.index] <- t1.red.signal[1:(length(t1.red.signal)/2)]
   um[t1.red.index] <- t1.red.signal[(length(t1.red.signal)/2+1):length(t1.red.signal)]
 
-  print("Fitting Gaussian mixture model for probe of type 1 green--------")
+  if(verbose) message("Fitting Gaussian mixture model for probe of type 1 green")
   t1.green.index <- match(t1.green,probe)
   t1.green.index <- t1.green.index[which(!is.na(t1.green.index))]
   t1.green.signal <- c(m[t1.green.index],um[t1.green.index])
@@ -62,7 +63,7 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
                      1 - pnorm(um[t1.green.index], t1.green.mean[1], t1.green.sd[1])),
                1, min)
 
-  print("Normalizing probe of type 1 green-------------------------------")
+  if(verbose) message("Normalizing probe of type 1 green")
   temp = t1.green.signal
   t1.green.signal[which(t1.green.model$classification == 1)] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 1)],t1.green.mean[1], t1.green.sd[1]), ref$t1.green.ref.mean[1], ref$t1.green.ref.sd[1])
   t1.green.signal[which(t1.green.model$classification == 2)] <- qnorm(pnorm(t1.green.signal[which(t1.green.model$classification == 2)],t1.green.mean[2], t1.green.sd[2]), ref$t1.green.ref.mean[2], ref$t1.green.ref.sd[2])
@@ -72,8 +73,7 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
   m[t1.green.index] <- t1.green.signal[1:(length(t1.green.signal)/2)]
   um[t1.green.index] <- t1.green.signal[(length(t1.green.signal)/2+1):length(t1.green.signal)]
 
-
-  print("Detecting p value-----------------------------------------------")
+  if(verbose) message("Detecting p value")
   t2.index <- match(t2, probe)
   t2.index <- t2.index[which(!is.na(t2.index))]
   pII <- apply(cbind(1 - pnorm(um[t2.index], t1.red.mean[1], t1.red.sd[1]),
@@ -89,12 +89,5 @@ gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default') {
                                        as.numeric(p[probe, 1])))
   row.names(normalized.signal) <- probe
   names(normalized.signal) <- c("m", "um", "p")
-
-  print("Normalizing between probe type----------------------------------")
-  beta <- normalized.signal$m / (normalized.signal$m + normalized.signal$um)
-  beta[which(normalized.signal$p < 0.01)] <- BMIQ(beta[which(normalized.signal$p < 0.01)], type[which(p < 0.01)])
-  beta[which(normalized.signal$p >= 0.01)] = NA
-  normalized.signal$beta <- beta
   return(normalized.signal)
-  print("Finished--------------------------------------------------------")
 }

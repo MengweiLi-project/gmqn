@@ -3,8 +3,12 @@
 #' The BMIQ was developed by Andrew Teschendorff in 2013 and this implementation is the based on the version modified by Steve Horvath. I also removed and modified some parameters to simplify the function.
 #' @param beta.v A list of DNA methylation level
 #' @param design.v A list of probe design('I' or 'II')
+#' @param nfit number of probes of a given design type to use for the fitting. Default is 50000. Smaller values (~10000) will make BMIQ run faster at the expense of a small loss in accuracy. For most applications, 5000 or 10000 is ok.
+#' @param th1.v thresholds used for the initialisation of the EM-algorithm, they should represent buest guesses for calling probes hemi-methylated and methylated, and will be refined by the EM algorithm. Default values work well in most cases.
+#' @param niter maximum number of EM iterations to do. This number should be large enough to yield good fits to the type1 distribution. By default 5.
+#' @param tol tolerance convergence threshold for EM algorithm. By default 0.001.
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
-BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
+.BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
                  niter = 5, tol = 0.001){
 
   type1.idx <- which(design.v == 'I')
@@ -165,3 +169,77 @@ BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
 
   return(pnbeta.v)
 }
+
+.betaEst2 <- function (y, w, weights) {
+  yobs <- !is.na(y)
+  if (sum(yobs) <= 1)
+    return(c(1, 1))
+  y <- y[yobs]
+  w <- w[yobs]
+  weights <- weights[yobs]
+  N <- sum(weights * w)
+  p <- sum(weights * w * y) / N
+  v <- sum(weights * w * y * y) / N - p * p
+  logab = log(c(p, 1 - p)) + log(pmax(1e-06, p * (1 - p)/v -1))
+  if (sum(yobs) == 2)
+    return(exp(logab))
+  opt <- try(optim(logab, betaObjf, ydata = y, wdata = w, weights = weights,
+                   method = "Nelder-Mead", control = list(maxit = 50)), silent = TRUE)
+  if (inherits(opt, "try-error"))
+    return(c(1, 1))
+  exp(opt$par)
+}
+
+.blc2 <- function(Y, w, maxiter = 25, tol = 1e-06, weights = NULL, verbose = FALSE) {
+  Ymn <- min(Y[Y > 0], na.rm = TRUE)
+  Ymx <- max(Y[Y < 1], na.rm = TRUE)
+  Y <- pmax(Y, Ymn/2)
+  Y <- pmin(Y, 1 - (1 - Ymx) / 2)
+  Yobs <- !is.na(Y)
+  J <- dim(Y)[2]
+  K <- dim(w)[2]
+  n <- dim(w)[1]
+  if (n != dim(Y)[1])
+    stop("Dimensions of w and Y do not agree")
+  if (is.null(weights))
+    weights = rep(1, n)
+  mu = a = b = matrix(Inf, K, J)
+  crit <- Inf
+  for (i in 1:maxiter) {
+    warn0 <- options()$warn
+    options(warn = -1)
+    eta <- apply(weights * w, 2, sum)/sum(weights)
+    mu0 <- mu
+    for (k in 1:K) {
+      for (j in 1:J) {
+        ab <- .betaEst2(Y[, j], w[, k], weights)
+        a[k, j] <- ab[1]
+        b[k, j] <- ab[2]
+        mu[k, j] <- ab[1]/sum(ab)
+      }
+    }
+    ww <- array(0, dim = c(n, J, K))
+    for (k in 1:K) {
+      for (j in 1:J) {
+        ww[Yobs[, j], j, k] <- dbeta(Y[Yobs[, j], j],
+                                     a[k, j], b[k, j], log = TRUE)
+      }
+    }
+    options(warn = warn0)
+    w <- apply(ww, c(1, 3), sum, na.rm = TRUE)
+    wmax <- apply(w, 1, max)
+    for (k in 1:K) w[, k] = w[, k] - wmax
+    w <- t(eta * t(exp(w)))
+    like <- apply(w, 1, sum)
+    w <- (1/like) * w
+    llike <- weights * (log(like) + wmax)
+    crit <- max(abs(mu - mu0))
+    if (verbose)
+      print(crit)
+    if (crit < tol)
+      break
+  }
+  return(list(a = a, b = b, eta = eta, mu = mu, w = w, llike = sum(llike)))
+}
+
+

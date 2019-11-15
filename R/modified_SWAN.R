@@ -1,19 +1,20 @@
-modifiedSWAN <- function(Meth, Unmeth, probe) {
+# We slightly modified swan function in minfi package. When the signal value is less than 0, we make it equal to the non-zero minimum value not the background signal intensity.
 
+.modified_SWAN <- function(Meth, Unmeth, probe) {
   counts <- CpG.counts[CpG.counts$Name %in% probe, ]
   subset <- min(
     table(counts$nCpG[counts$Type == "I" & counts$nCpG %in% 1:3]),
     table(counts$nCpG[counts$Type == "II" & counts$nCpG %in% 1:3]))
 
   xNormSet <- lapply(c("I", "II"), function(type) {
-    getSubset(counts$nCpG[counts$Type == type], subset)
+    .getSubset(counts$nCpG[counts$Type == type], subset)
   })
 
-  M <- SWAN(
+  M <- .SWAN(
     x = Meth,
     xNormSet = xNormSet,
     counts = counts)
-  U <- SWAN(
+  U <- .SWAN(
     x = Unmeth,
     xNormSet = xNormSet,
     counts = counts)
@@ -21,7 +22,7 @@ modifiedSWAN <- function(Meth, Unmeth, probe) {
   return(list(M = M, U = U))
 }
 
-getSubset <- function(counts, subset){
+.getSubset <- function(counts, subset){
   x <- integer(0)
   for (i in 1:3) {
     x <- c(x, sample(seq.int(1, length(counts))[counts == i], subset))
@@ -29,7 +30,7 @@ getSubset <- function(counts, subset){
   seq.int(1, length(counts)) %in% x
 }
 
-SWAN = function(x, xNormSet, counts) {
+.SWAN = function(x, xNormSet, counts) {
   normalized_x <- matrix(NA_real_,
                          ncol = ncol(x),
                          nrow = nrow(x),
@@ -37,7 +38,7 @@ SWAN = function(x, xNormSet, counts) {
   typeI_idx <- rownames(x) %in% counts$Name[counts$Type == "I"]
   typeII_idx <- rownames(x) %in% counts$Name[counts$Type == "II"]
   for (j in seq_len(ncol(x))) {
-    normalized_x[, j] <- normaliseChannel(
+    normalized_x[, j] <- .normaliseChannel(
       intensityI = x[typeI_idx, j],
       intensityII = x[typeII_idx, j],
       xNormSet = xNormSet)
@@ -45,17 +46,17 @@ SWAN = function(x, xNormSet, counts) {
   normalized_x
 }
 
-normaliseChannel <- function(intensityI, intensityII, xNormSet) {
-  xTarget <- aveQuantile(
+.normaliseChannel <- function(intensityI, intensityII, xNormSet) {
+  xTarget <- .aveQuantile(
     list(intensityI[xNormSet[[1]]], intensityII[xNormSet[[2]]]))
   xNorm <- unlist(
-    subsetQuantileNorm(
+    .subsetQuantileNorm(
       list(intensityI, intensityII), xNormSet, xTarget))
   names(xNorm) <- c(names(intensityI), names(intensityII))
   xNorm
 }
 
-aveQuantile <- function(X) {
+.aveQuantile <- function(X) {
   nbrOfChannels <- length(X)
   if (nbrOfChannels == 1) {
     return(X)
@@ -85,7 +86,7 @@ aveQuantile <- function(X) {
 }
 
 
-subsetQuantileNorm <- function(x, xNormSet, xTarget) {
+.subsetQuantileNorm <- function(x, xNormSet, xTarget) {
   for(i in 1:length(x)){
     n <- length(x[[i]])
     nTarget <- length(xTarget)
@@ -114,6 +115,7 @@ subsetQuantileNorm <- function(x, xNormSet, xTarget) {
     x[[i]] <- approx(x = quantiles, y = xNorm, xout = xNew, ties = "ordered")$y #interpolate
     x[[i]][kmax]<- max(xNorm) + offsets.max
     x[[i]][kmin]<- min(xNorm) + offsets.min
+    #here is what we modified
     x[[i]] = ifelse(x[[i]] <= 0, min(x[[i]][which(x[[i]] > 0)]), x[[i]])
   }
   x
