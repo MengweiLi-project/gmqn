@@ -1,6 +1,4 @@
----
-title: "Gaussian Mixture Quantile Normalization (GMQN)"
----
+## Gaussian Mixture Quantile Normalization (GMQN)
 
 GMQN is a reference based method that removes unwanted technical variations at signal intensity level between samples for 450K and 850K DNA methylation array. It can also easily combined with Subset-quantile Within Array Normalization(SWAN) or Beta-Mixture Quantile (BMIQ) Normalisation to remove probe design bias.
 
