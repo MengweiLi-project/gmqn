@@ -9,15 +9,15 @@
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
 gmqn_swan <- function(m, um, probe, type = '450k', ref = 'default', verbose = TRUE) {
 
-  normalized.signal = gmqn_normalize(m, um, probe, type = '450k', ref = 'default', verbose = TRUE)
+  normalized.signal = gmqn_normalize(m, um, probe, type = type, ref = ref, verbose = TRUE)
 
   if(verbose) message("Start SWAN normalizing")
-  m = data.frame(m)
+  #m = data.frame(m)
   swan.processed = .modified_SWAN(data.frame(m, row.names = probe), data.frame(um, row.names = probe), probe)
   normalized.signal$m = swan.processed$M
   normalized.signal$um = swan.processed$U
   beta <- swan.processed$M / (swan.processed$M + swan.processed$U)
   beta[which(normalized.signal$p >= 0.01)] = NA
-  normalized.signal$beta = normalized.signal$beta
+  normalized.signal$beta = beta
   return(normalized.signal)
 }

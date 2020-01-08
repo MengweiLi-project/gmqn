@@ -9,7 +9,7 @@
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
 gmqn_bmiq <- function(m, um, probe, type = '450k', ref = 'default', verbose = TRUE) {
 
-  normalized.signal = gmqn_normalize(m, um, probe, type = '450k', ref = 'default', verbose = TRUE)
+  normalized.signal = gmqn_normalize(m, um, probe, type = type, ref = ref, verbose = TRUE)
 
   if(verbose) message("Start BMIQ normalizing")
   beta <- normalized.signal$m / (normalized.signal$m + normalized.signal$um)
