@@ -17,5 +17,5 @@ gmqn_swan_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, 
   beta.GMQN.swan = data.frame(beta.GMQN.swan)
   names(beta.GMQN.swan) = names(m)
   row.names(beta.GMQN.swan) = row.names(m)
-  return(res)
+  return(beta.GMQN.swan)
 }
