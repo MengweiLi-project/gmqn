@@ -9,7 +9,7 @@
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
 gmqn_swan_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, verbose = TRUE) {
 
-  registerDoParallel(max(ncol(m), ncpu))
+  registerDoParallel(min(ncol(m), ncpu))
   beta.GMQN.swan = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
     res = gmqn::gmqn_swan(m[, i], um[, i], row.names(m), type = type, ref = ref)
     res$beta
