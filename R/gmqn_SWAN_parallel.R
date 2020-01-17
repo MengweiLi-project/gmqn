@@ -15,12 +15,15 @@ gmqn_swan_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, 
   names(beta) = names(m)
 
   m = m[which(matrixStats::rowAnyNAs(as.matrix(m)) == F),]
-  um = um[which(matrixStats::rowAnyNAs(as.matrix(m)) == F),]
+  um = um[which(matrixStats::rowAnyNAs(as.matrix(um)) == F),]
   registerDoParallel(min(ncol(m), ncpu))
-  beta.GMQN.swan = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
-    res = gmqn::gmqn_swan(m[,i], um[,i], row.names(m), type = type, ref = ref)
-    res$beta
-  }
+
+  gmqn_swan(m[,1], um[,1], row.names(m), type = type, ref = ref)
+
+  # beta.GMQN.swan = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
+  #   res = gmqn::gmqn_swan(m[,i], um[,i], row.names(m), type = type, ref = ref)
+  #   res$beta
+  # }
   beta.GMQN.swan = data.frame(beta.GMQN.swan)
   names(beta.GMQN.swan) = names(m)
   row.names(beta.GMQN.swan) = row.names(m)
