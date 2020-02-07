@@ -9,22 +9,33 @@
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
 gmqn_swan_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, verbose = TRUE) {
 
-  beta = matrix(NA, nrow = dim(m)[1], ncol = dim(m)[2])
-  beta = data.frame(beta)
-  row.names(beta) = row.names(m)
-  names(beta) = names(m)
-
-  m = m[which(matrixStats::rowAnyNAs(as.matrix(m)) == F),]
-  um = um[which(matrixStats::rowAnyNAs(as.matrix(um)) == F),]
+  # beta = matrix(NA, nrow = dim(m)[1], ncol = dim(m)[2])
+  # beta = data.frame(beta)
+  # row.names(beta) = row.names(m)
+  # names(beta) = names(m)
+  #
+  # m = m[which(matrixStats::rowAnyNAs(as.matrix(m)) == F),]
+  # um = um[which(matrixStats::rowAnyNAs(as.matrix(um)) == F),]
   registerDoParallel(min(ncol(m), ncpu))
 
   beta.GMQN.swan = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
-    res = gmqn::gmqn_swan(m[,i], um[,i], row.names(m), type = type, ref = ref)
-    res$beta
+
+    ##
+    beta = rep(NA, dim(m)[1])
+    no.na.index = which(is.na(m[,i]) == F & is.na(um[,i]) == F)
+    res = gmqn::gmqn_swan(m[no.na.index,i], um[no.na.index,i], row.names(m)[no.na.index], type = type, ref = ref)
+    beta[no.na.index] = res$beta
+    beta
+    ##
+    # res = gmqn::gmqn_swan(m[,i], um[,i], row.names(m), type = type, ref = ref)
+    # res$beta
   }
   beta.GMQN.swan = data.frame(beta.GMQN.swan)
   names(beta.GMQN.swan) = names(m)
   row.names(beta.GMQN.swan) = row.names(m)
-  beta[row.names(m),] = beta.GMQN.swan
-  return(beta)
+  # beta.GMQN.swan = data.frame(beta.GMQN.swan)
+  # names(beta.GMQN.swan) = names(m)
+  # row.names(beta.GMQN.swan) = row.names(m)
+  # beta[row.names(m),] = beta.GMQN.swan
+  return(beta.GMQN.swan)
 }
