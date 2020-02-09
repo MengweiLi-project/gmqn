@@ -10,10 +10,10 @@
 gmqn_normalize <- function(m, um, probe, type = '450k', ref = 'default', verbose = TRUE) {
 
   if (ref == 'default') {
-    ref = list(t1.green.ref.mean=c(361.0165,9646.7525),
-               t1.green.ref.sd=c(278.9551,5109.423),
-               t1.red.ref.mean=c(696.0015,12036.3621),
-               t1.red.ref.sd=c(519.3141,7002.863))
+    ref = list(t1.green.ref.mean=c(268.9645,6884.7993),
+               t1.green.ref.sd=c(203.8351,3682.3554),
+               t1.red.ref.mean=c(519.537,8662.520),
+               t1.red.ref.sd=c(380.9977,5064.9526))
   }
 
   if (type == '450k') {

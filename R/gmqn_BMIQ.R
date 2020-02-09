@@ -13,7 +13,8 @@ gmqn_bmiq <- function(m, um, probe, type = '450k', ref = 'default', verbose = TR
 
   if(verbose) message("Start BMIQ normalizing")
   beta <- normalized.signal$m / (normalized.signal$m + normalized.signal$um)
-  beta[which(normalized.signal$p < 0.01)] <- .BMIQ(beta[which(normalized.signal$p < 0.01)], type[which(p < 0.01)])
+  design = CpG.counts[probe,"Type"]
+  beta[which(normalized.signal$p < 0.01)] <- .BMIQ(beta[which(normalized.signal$p < 0.01)], design[which(p < 0.01)])
   beta[which(normalized.signal$p >= 0.01)] = NA
   normalized.signal$beta <- beta
   return(normalized.signal)
