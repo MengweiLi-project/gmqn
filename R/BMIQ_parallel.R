@@ -33,7 +33,7 @@ bmiq_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, verbo
   beta.BMIQ = foreach (i=1:ncol(m), .combine=cbind) %dopar% {
     beta = rep(NA, nrow(m))
     no.na.index = which(is.na(m[,i]) == F & is.na(um[,i]) == F)
-    beta.tem = m[no.na.index,i]/(m[no.na.index,i]+um[no.na.index,i])
+    beta.tem = m[no.na.index,i]/(m[no.na.index,i]+um[no.na.index,i]+1)
     design = CpG.counts[row.names(m)[no.na.index],"Type"]
     res = gmqn::BMIQ(beta.tem, design)
     beta[no.na.index] = res
