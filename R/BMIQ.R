@@ -8,7 +8,7 @@
 #' @param niter maximum number of EM iterations to do. This number should be large enough to yield good fits to the type1 distribution. By default 5.
 #' @param tol tolerance convergence threshold for EM algorithm. By default 0.001.
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
-.BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
+BMIQ <- function(beta.v, design.v, nfit = 50000, th1.v = c(0.2,0.75),
                  niter = 5, tol = 0.001){
 
   type1.idx <- which(design.v == 'I')

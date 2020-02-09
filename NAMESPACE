@@ -1,7 +1,15 @@
 exportPattern("^[[:alpha:]]+")
 import(RPMM,doParallel,foreach)
 importFrom(mclust, Mclust, mclustBIC)
-export(gmqn_normalize, gmqn_bmiq, gmqn_swan, set_reference, gmqn_swan_parallel)
+export(BMIQ,
+       bmiq_parallel
+       gmqn_bmiq,
+       gmqn_bmiq_parallel,
+       gmqn_normalize,
+       gmqn_parallel,
+       gmqn_swan,
+       gmqn_swan_parallel,
+       set_reference)
 
 
 
