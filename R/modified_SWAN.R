@@ -1,6 +1,7 @@
 # We slightly modified swan function in minfi package. When the signal value is less than 0, we make it equal to the non-zero minimum value not the background signal intensity.
 
 .modified_SWAN <- function(Meth, Unmeth, probe) {
+  set.seed(1)
   counts <- CpG.counts[CpG.counts$Name %in% probe, ]
   subset <- min(
     table(counts$nCpG[counts$Type == "I" & counts$nCpG %in% 1:3]),
