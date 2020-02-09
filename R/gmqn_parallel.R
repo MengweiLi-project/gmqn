@@ -34,8 +34,7 @@ gmqn_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, verbo
     beta = rep(NA, nrow(m))
     no.na.index = which(is.na(m[,i]) == F & is.na(um[,i]) == F)
     res = gmqn::gmqn_normalize(m[no.na.index,i], um[no.na.index,i], row.names(m)[no.na.index], type = type, ref = ref)
-
-    beta.tmp <- res$M / (res$M + res$U)
+    beta.tmp <- res$m / (res$m + res$um)
     beta.tmp[which(res$p >= 0.01)] = NA
     beta[no.na.index] = beta.tmp
     beta
