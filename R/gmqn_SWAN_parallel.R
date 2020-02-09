@@ -8,34 +8,37 @@
 #' @param ref The reference used to normalize data. By default, it uses the reference set up from GSE105018 which is also used in EWAS Datahub.
 #' @return A data frame contains normalized m and um, p value, and DNA methylation level
 gmqn_swan_parallel <- function(m, um, type = '450k', ref = 'default', ncpu = 4, verbose = TRUE) {
-
-  # beta = matrix(NA, nrow = dim(m)[1], ncol = dim(m)[2])
-  # beta = data.frame(beta)
-  # row.names(beta) = row.names(m)
-  # names(beta) = names(m)
-  #
-  # m = m[which(matrixStats::rowAnyNAs(as.matrix(m)) == F),]
-  # um = um[which(matrixStats::rowAnyNAs(as.matrix(um)) == F),]
   registerDoParallel(min(ncol(m), ncpu))
 
-  beta.GMQN.swan = foreach (i=1:dim(m)[2], .combine=cbind) %dopar% {
 
-    ##
-    beta = rep(NA, dim(m)[1])
+  if (type == '450k') {
+    m.tem = matrix(nrow = 485512, ncol = ncol(m))
+    m.tem = data.frame(m.tem)
+    row.names(m.tem) = row.names(annon_450k)
+  } else if (type == '850k') {
+    m.tem = matrix(nrow = 866836, ncol = ncol(m))
+    m.tem = data.frame(m.tem)
+    row.names(m.tem) = row.names(annon_850k)
+  } else {
+    stop("Incorrect platform type!")
+  }
+
+  names(m.tem) = names(m)
+  um.tem = m.tem
+  m.tem[intersect(row.names(m), row.names(m.tem)),] = m[intersect(row.names(m), row.names(m.tem)),]
+  um.tem[intersect(row.names(um), row.names(m.tem)),] = um[intersect(row.names(um), row.names(um.tem)),]
+  m = m.tem
+  um = um.tem
+
+  beta.GMQN.swan = foreach (i=1:ncol(m), .combine=cbind) %dopar% {
+    beta = rep(NA, nrow(m))
     no.na.index = which(is.na(m[,i]) == F & is.na(um[,i]) == F)
     res = gmqn::gmqn_swan(m[no.na.index,i], um[no.na.index,i], row.names(m)[no.na.index], type = type, ref = ref)
     beta[no.na.index] = res$beta
     beta
-    ##
-    # res = gmqn::gmqn_swan(m[,i], um[,i], row.names(m), type = type, ref = ref)
-    # res$beta
   }
   beta.GMQN.swan = data.frame(beta.GMQN.swan)
   names(beta.GMQN.swan) = names(m)
   row.names(beta.GMQN.swan) = row.names(m)
-  # beta.GMQN.swan = data.frame(beta.GMQN.swan)
-  # names(beta.GMQN.swan) = names(m)
-  # row.names(beta.GMQN.swan) = row.names(m)
-  # beta[row.names(m),] = beta.GMQN.swan
   return(beta.GMQN.swan)
 }
