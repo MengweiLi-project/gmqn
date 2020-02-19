@@ -30,8 +30,8 @@ MSet <- preprocessRaw(RGSet) # Other preprocess methods can also be used.
 m = data.frame(getMeth(MSet))
 um = data.frame(getUnmeth(MSet))
 
-# You can skip this line if you want to use default reference.
 library(gmqn)
+# You can skip this line if you want to use default reference.
 ref = set_reference(m, um)
 beta.GMQN.swan = gmqn_swan_parallel(m, um, ncpu = 45, ref = ref)
 beta.GMQN.bmiq = gmqn_bmiq_parallel(m, um, ncpu = 45, ref = ref)
